@@ -19,11 +19,19 @@ def _load_grayscale(image_path: str | Path, background: int) -> Image.Image:
 
 
 def _add_noise(image: Image.Image, strength: float) -> Image.Image:
-    """Add centered Gaussian noise while clamping grayscale values to 0..255."""
+    """Add Gaussian noise to the finished RGB pixels, preserving their alpha."""
     if strength == 0:
         return image.copy()
-    with Image.effect_noise(image.size, strength) as noise:
-        return ImageChops.add(image, noise, offset=-128)
+    with (
+        image.convert("RGB") as rgb,
+        Image.effect_noise(image.size, strength) as noise,
+        noise.convert("RGB") as rgb_noise,
+        ImageChops.add(rgb, rgb_noise, offset=-128) as noisy_rgb,
+        image.getchannel("A") as alpha,
+    ):
+        result = noisy_rgb.convert("RGBA")
+        result.putalpha(alpha)
+        return result
 
 
 def create_phantom_tank(
@@ -37,7 +45,7 @@ def create_phantom_tank(
 
     Even cells use black RGB and alpha=255-visible to hide on black.
     Odd cells use white RGB and alpha=invisible to hide on white.
-    Add Gaussian noise to the inner image before encoding; zero disables it.
+    Add Gaussian noise after compositing, preserving alpha; zero disables it.
     """
     if not isfinite(noise_strength) or noise_strength < 0:
         raise ValueError("噪点强度必须是非负有限数值")
@@ -56,8 +64,7 @@ def create_phantom_tank(
     )
 
     with (
-        _load_grayscale(invisible_image_path, background=0) as original_invisible,
-        _add_noise(original_invisible, noise_strength) as invisible,
+        _load_grayscale(invisible_image_path, background=0) as invisible,
         _load_grayscale(visible_image_path, background=255) as visible,
         visible.resize(invisible.size, Image.Resampling.LANCZOS) as resized_visible,
         ImageOps.invert(resized_visible) as visible_alpha,
@@ -73,7 +80,8 @@ def create_phantom_tank(
         with (
             Image.frombytes("L", invisible.size, mask_bytes) as mask,
             Image.composite(visible_layer, invisible_layer, mask) as result,
+            _add_noise(result, noise_strength) as noisy_result,
         ):
-            result.save(output_path, format="PNG")
+            noisy_result.save(output_path, format="PNG")
 
     return output_path
