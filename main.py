@@ -123,7 +123,7 @@ class MyPlugin(Star):
             )
             logger.info(response)
             needs_protection = self.open_sensitive_protection and any(
-                float(response[key]) > self.sensitive_score
+                float(response[key]) >= self.sensitive_score
                 for key in (
                     "ads_score",
                     "politics_score",
