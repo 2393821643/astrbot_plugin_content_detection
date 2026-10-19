@@ -1,26 +1,70 @@
 {
-    "secret_id": {
+  "cos_config": {
+    "description": "腾讯云配置",
+    "type": "object",
+    "hint": "配置腾讯云内容检测,只有配置后才能使用内容检测和敏感保护",
+    "items": {
+      "open_content_detection": {
+        "description": "是否开启内容审核",
+        "type": "bool",
+        "hint": "开启后,可进行内容审核",
+        "default": true
+      },
+      "secret_id": {
         "description": "SecretId",
         "type": "string",
-        "hint": "请登录访问管理控制台进行查看和管理，https://console.cloud.tencent.com/cam/capi",
-        "obvious_hint": true
-    },
-    "secret_key": {
+        "hint": "请登录访问管理控制台进行查看和管理，https://console.cloud.tencent.com/cam/capi"
+      },
+      "secret_key": {
         "description": "SecretKey",
         "type": "string",
-        "hint": "请登录访问管理控制台进行查看和管理，https://console.cloud.tencent.com/cam/capi",
-        "obvious_hint": true
-    },
-    "region": {
+        "hint": "请登录访问管理控制台进行查看和管理，https://console.cloud.tencent.com/cam/capi"
+      },
+      "region": {
         "description": "region",
         "type": "string",
-        "hint": "已创建桶归属的 region 可以在控制台查看，https://console.cloud.tencent.com/cos5/bucket",
-        "obvious_hint": true
-    },
-    "bucket": {
+        "hint": "已创建桶归属的 region 可以在控制台查看，https://console.cloud.tencent.com/cos5/bucket"
+      },
+      "bucket": {
         "description": "bucket",
         "type": "string",
-        "hint": "桶的名称 可以在控制台查看，https://console.cloud.tencent.com/cos5/bucket",
-        "obvious_hint": true
+        "hint": "桶的名称 可以在控制台查看，https://console.cloud.tencent.com/cos5/bucket"
+      }
     }
+  },
+  "sensitive_protection": {
+    "description": "敏感保护",
+    "type": "object",
+    "hint": "敏感保护配置",
+    "items": {
+      "open_sensitive_protection": {
+        "description": "是否开启敏感保护",
+        "type": "bool",
+        "hint": "开启后,超过设定的敏感分数将会被幻影坦克混淆",
+        "default": true
+      },
+      "sensitive_score": {
+        "description": "敏感分数",
+        "type": "int",
+        "hint": "0~60分表示图片正常，60~90分表示图片疑似敏感，90~100分确定敏感",
+        "slider": {
+          "min": 0,
+          "max": 100,
+          "step": 90
+        },
+        "default": 90
+      }
+    }
+  },
+  "noise_level":{
+    "description": "噪点等级",
+        "type": "int",
+        "hint": "等级越高，噪点越多",
+        "slider": {
+          "min": 0,
+          "max": 10,
+          "step": 1
+        },
+        "default": 5
+  }
 }
