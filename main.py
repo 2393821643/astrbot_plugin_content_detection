@@ -17,7 +17,7 @@ from .encrypt_tool import decrypt_image, encrypt_image
 from .phantom_tank_tool import create_phantom_tank
 
 
-@register("astrbot_plugin_content_detection", "mataHape", "腾讯云CI内容检测", "1.0.0")
+@register("astrbot_plugin_content_detection", "mataHape", "腾讯云CI内容检测和幻影坦克制作", "2.0.0")
 class MyPlugin(Star):
     # 判断配置是否完整
     def config_is_complete(self):
@@ -69,7 +69,7 @@ class MyPlugin(Star):
         """可选择实现异步的插件销毁方法，当插件被卸载/停用时会调用。"""
 
     # 图片检测入口
-    @filter.event_message_type(EventMessageType.GROUP_MESSAGE)
+    @filter.event_message_type(EventMessageType.ALL)
     async def check_image(self, event: AstrMessageEvent):
         # 是否需要图片检测
         if not self.open_content_detection:
@@ -152,7 +152,9 @@ class MyPlugin(Star):
 
             if needs_protection:
                 result_msg_list.append(
-                    Plain("\u200b\n\u200b当前图片分数超过设定值，已生成幻影坦克，请点击查看")
+                    Plain(
+                        "\u200b\n\u200b当前图片分数超过设定值，已生成幻影坦克，请点击查看"
+                    )
                 )
                 await self._send_phantom_tank(
                     event, first_image_url, extra_components=result_msg_list
@@ -165,7 +167,7 @@ class MyPlugin(Star):
             yield event.plain_result("图片检测请求出错，请检查配置是否正确")
 
     # 图片加密入口
-    @filter.event_message_type(EventMessageType.GROUP_MESSAGE)
+    @filter.event_message_type(EventMessageType.ALL)
     async def image_encrypt(self, event: AstrMessageEvent):
         # 是否需要图片加密
         need_encrypt = False
@@ -205,7 +207,7 @@ class MyPlugin(Star):
         await self._process_image(event, first_image_url, decrypt=False)
 
     # 图片解密入口
-    @filter.event_message_type(EventMessageType.GROUP_MESSAGE)
+    @filter.event_message_type(EventMessageType.ALL)
     async def image_decrypt(self, event: AstrMessageEvent):
         need_decrypt = False
         first_image_url = None
@@ -242,6 +244,10 @@ class MyPlugin(Star):
         )
         source_path = plugin_data_path / f"{uuid4()}.img"
         output_path = source_path.with_name(f"{source_path.stem}_{operation}.png")
+        phantom_path = output_path.with_name(f"{output_path.stem}_phantom_tank.png")
+        temporary_paths = [source_path, output_path]
+        if decrypt:
+            temporary_paths.append(phantom_path)
 
         try:
             plugin_data_path.mkdir(parents=True, exist_ok=True)
@@ -252,7 +258,18 @@ class MyPlugin(Star):
             transform = decrypt_image if decrypt else encrypt_image
             await self._run_image_processing(transform, source_path)
 
-            result_msg_list = [Image.fromFileSystem(str(output_path))]
+            send_path = output_path
+            if decrypt:
+                await self._run_image_processing(
+                    create_phantom_tank,
+                    output_path,
+                    Path(__file__).with_name("def.png"),
+                    phantom_path,
+                    noise_strength=self.noise_level,
+                )
+                send_path = phantom_path
+
+            result_msg_list = [Image.fromFileSystem(str(send_path))]
             await event.send(event.chain_result(result_msg_list))
         except Exception as e:
             logger.error(f"图片{action}失败: {e}")
@@ -260,7 +277,7 @@ class MyPlugin(Star):
                 event.plain_result(f"图片{action}失败，请检查图片链接和格式")
             )
         finally:
-            for image_path in (source_path, output_path):
+            for image_path in temporary_paths:
                 try:
                     image_path.unlink(missing_ok=True)
                 except OSError as e:
@@ -291,7 +308,7 @@ class MyPlugin(Star):
                 raise
 
     # 幻影坦克入口
-    @filter.event_message_type(EventMessageType.GROUP_MESSAGE)
+    @filter.event_message_type(EventMessageType.ALL)
     async def image_phantom_tank(self, event: AstrMessageEvent):
         need_phantom_tank = False
         invisible_img_url = None  # 里图
