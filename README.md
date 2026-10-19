@@ -21,6 +21,11 @@ AstrBot 插件模板 / A template plugin for AstrBot plugin feature
 
 描述：利用腾讯云CI对图片进行打分
 
+开启 `sensitive_protection.open_sensitive_protection` 后，广告、违规、涩情、暴力中的任意
+分数严格超过 `sensitive_protection.sensitive_score` 时，将检测图片作为里图、`def.png`
+作为表图制作幻影坦克，并随图片返回检测分数。等于阈值时不触发转换。
+制作失败时返回错误提示，不回退发送原图；临时文件在发送结束或失败后清理。
+
 # 图片加密与解密
 
 群聊发送 `图片加密` 或 `图片解密`，同时附带一张图片，也可以引用包含图片的消息。

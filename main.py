@@ -54,15 +54,11 @@ class MyPlugin(Star):
         )
         self.cos_client = CosS3Client(cos_config)
         # 获取敏感保护配置
-        self.open_sensitive_protection = (
-            config.get("sensitive_protection", "{}").get(
-                "open_sensitive_protection", True
-            )
-            or True
+        sensitive_config = config.get("sensitive_protection", {})
+        self.open_sensitive_protection = sensitive_config.get(
+            "open_sensitive_protection", True
         )
-        self.sensitive_score = (
-            config.get("sensitive_protection", "{}").get("sensitive_score", 90) or 90
-        )
+        self.sensitive_score = sensitive_config.get("sensitive_score", 90)
         # 噪点等级
         self.noise_level = config.get("noise_level", 5)
 
@@ -126,10 +122,18 @@ class MyPlugin(Star):
                 image_url=first_image_url,
             )
             logger.info(response)
+            needs_protection = self.open_sensitive_protection and any(
+                float(response[key]) > self.sensitive_score
+                for key in (
+                    "ads_score",
+                    "politics_score",
+                    "porn_score",
+                    "terrorism_score",
+                )
+            )
             # 添加结果到消息列表
             # 在 aiocqhttp 消息适配器中，对于 plain 类型的消息，在发送中会使用 strip() 方法去除空格及换行符，可以在消息前后添加零宽空格 \u200b 以解决这个问题。
             result_msg_list = []
-            result_msg_list.append(Image.fromURL(first_image_url))
             result_msg_list.append(
                 Plain(f"广告：{response['ads_score']} \u200b\n\u200b")
             )
@@ -146,7 +150,16 @@ class MyPlugin(Star):
                 Plain("0~60分表示图片正常，60~90分表示图片疑似敏感，90~100分确定敏感")
             )
 
-            yield event.chain_result(result_msg_list)
+            if needs_protection:
+                result_msg_list.append(
+                    Plain("\u200b\n\u200b当前图片分数超过设定值，已生成幻影坦克，请点击查看")
+                )
+                await self._send_phantom_tank(
+                    event, first_image_url, extra_components=result_msg_list
+                )
+            else:
+                result_msg_list.insert(0, Image.fromURL(first_image_url))
+                yield event.chain_result(result_msg_list)
         except Exception as e:
             logger.error(f"COS检测请求失败: {e}")
             yield event.plain_result("图片检测请求出错，请检查配置是否正确")
@@ -307,6 +320,16 @@ class MyPlugin(Star):
             return
 
         yield event.plain_result("开始进行幻影坦克制作")
+        await self._send_phantom_tank(event, invisible_img_url, visible_img_url)
+
+    async def _send_phantom_tank(
+        self,
+        event: AstrMessageEvent,
+        invisible_img_url: str,
+        visible_img_url: str | None = None,
+        extra_components: list | None = None,
+    ):
+        """Build and send a tank with optional results, then clean temporary files."""
         plugin_data_path = (
             Path(get_astrbot_data_path())
             / "plugin_data"
@@ -343,6 +366,8 @@ class MyPlugin(Star):
                 noise_strength=self.noise_level,
             )
             result_msg_list = [Image.fromFileSystem(str(output_path))]
+            if extra_components:
+                result_msg_list.extend(extra_components)
             await event.send(event.chain_result(result_msg_list))
         except Exception as e:
             logger.error(f"幻影坦克制作失败: {e}")
