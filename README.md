@@ -19,7 +19,7 @@
 
 ## 2:安装说明
 
-> [!error]
+> [!CAUTION]
 >
 > 注：由于AstrBot4.26后对底层代码进行修改，本插件无法在AstrBot4.26及其以上使用。后续插件将会适配
 
@@ -59,17 +59,17 @@ pip install -U cos-python-sdk-v5
 
 这里图省事直接使用主账号API访问密钥
 
-![](https://github-1314180676.cos.ap-guangzhou.myqcloud.com/QQ20261020-010218.png)
+![](https://www.matahape.cn/minio/share/github/QQ20261020-010218.png)
 
 点击继续使用后，将出现SecretId和SecretKey,这里请记录这2个值，否则后续找不到只能重新创建。勾选“我已知晓并保存SecretKey”后点击确认。到这里密钥就创建完毕。请保管好你的密钥防止泄露，你也不想你的密钥被别人刷吧。
 
-![](https://github-1314180676.cos.ap-guangzhou.myqcloud.com/QQ20261020-010757.png)
+![](https://www.matahape.cn/minio/share/github/QQ20261020-010757.png)
 
 ### 3.2:创建桶
 
 在https://console.cloud.tencent.com/cos5/bucket中创建桶，点击创建存储桶，进入创建页面
 
-![](https://github-1314180676.cos.ap-guangzhou.myqcloud.com/QQ20261020-012901.png)
+![](https://www.matahape.cn/minio/share/github/QQ20261020-012901.png)
 
 在创建页面中，输入名称；
 
@@ -79,7 +79,7 @@ pip install -U cos-python-sdk-v5
 
 访问权限选择"公有读私有写"
 
-![](https://github-1314180676.cos.ap-guangzhou.myqcloud.com/QQ20261020-013507.png)
+![](https://www.matahape.cn/minio/share/github/QQ20261020-013507.png)
 
 点击创建后，完成桶的创建
 
@@ -101,20 +101,21 @@ pip install -U cos-python-sdk-v5
 
 ## 4:配置说明
 
-| 配置项目         | 配置值                 | 配置描述                                                     |
-| ---------------- | ---------------------- | ------------------------------------------------------------ |
-| 是否开启内容审核 | 开/关                  | 开启后,可进行内容审核                                        |
-| SecretId         | 例：AB123cd456         | 密钥                                                         |
-| SecretKey        | 例：AbcdEFg            | 密钥                                                         |
-| region           | 例：ap-beijing         | 存储桶地域ID                                                 |
-| bucket           | 例：test-bucket-123456 | 存储桶名称 注意：-后面的数字也要                             |
-| 是否开启敏感保护 | 开/关                  | 是否开启敏感保护 开启敏感保护后，如果图片检测的分数超过敏感分数，则通过幻影坦克展示 |
-| 敏感分数         | 0~100 默认90           | 0~60分表示图片正常，60~90分表示图片疑似敏感，90~100分确定敏感 |
-| 噪点等级         | 0~10 默认5             | 这是幻影坦克的噪点。等级越高，噪点越多                       |
+| 配置项目             | 配置值                 | 配置描述                                                     |
+| -------------------- | ---------------------- | ------------------------------------------------------------ |
+| 是否开启内容审核     | 开/关                  | 开启后,可进行内容审核                                        |
+| SecretId             | 例：AB123cd456         | 密钥                                                         |
+| SecretKey            | 例：AbcdEFg            | 密钥                                                         |
+| region               | 例：ap-beijing         | 存储桶地域ID                                                 |
+| bucket               | 例：test-bucket-123456 | 存储桶名称 注意：-后面的数字也要                             |
+| 是否开启敏感保护     | 开/关                  | 是否开启敏感保护 开启敏感保护后，如果图片检测的分数超过敏感分数，则通过幻影坦克展示 |
+| 敏感分数             | 0~100 默认90           | 0~60分表示图片正常，60~90分表示图片疑似敏感，90~100分确定敏感 |
+| 噪点等级             | 0~10 默认5             | 这是幻影坦克的噪点。等级越高，噪点越多                       |
+| 图片检测文件大小限制 | 5~32 默认16            | 超过图片文件大小将不被检测,单位MB                            |
 
-![](https://github-1314180676.cos.ap-guangzhou.myqcloud.com/QQ20261020-014336.png)
+![](https://www.matahape.cn/minio/share/github/QQ20261020-014336.png)
 
-![](https://github-1314180676.cos.ap-guangzhou.myqcloud.com/QQ20261020-014610.png)
+![](https://www.matahape.cn/minio/share/github/QQ20261020-221246.png)
 
 ## 5:命令
 
@@ -133,11 +134,11 @@ pip install -U cos-python-sdk-v5
 
 例1：
 
-![](https://github-1314180676.cos.ap-guangzhou.myqcloud.com/QQ20261020-015000.png)
+![](https://www.matahape.cn/minio/share/github/QQ20261020-015000.png)
 
 例2：
 
-![](https://github-1314180676.cos.ap-guangzhou.myqcloud.com/QQ20261020-015133.png)
+![](https://www.matahape.cn/minio/share/github/QQ20261020-015133.png)
 
 ### 5.2:图片加密
 
@@ -147,7 +148,7 @@ pip install -U cos-python-sdk-v5
 
 例：
 
-![](https://github-1314180676.cos.ap-guangzhou.myqcloud.com/QQ20261020-015422.png)
+![](https://www.matahape.cn/minio/share/github/QQ20261020-015422.png)
 
 ### 5.3:图片解密
 
@@ -157,7 +158,7 @@ pip install -U cos-python-sdk-v5
 
 例：
 
-![](https://github-1314180676.cos.ap-guangzhou.myqcloud.com/QQ20261020-015749.png)
+![](https://www.matahape.cn/minio/share/github/QQ20261020-015749.png)
 
 ### 5.4:幻影坦克
 
@@ -168,4 +169,4 @@ pip install -U cos-python-sdk-v5
 
 例：
 
-![](https://github-1314180676.cos.ap-guangzhou.myqcloud.com/QQ20261020-020117.png)
+![](https://www.matahape.cn/minio/share/github/QQ20261020-020117.png)
