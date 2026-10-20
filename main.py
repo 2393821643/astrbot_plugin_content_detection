@@ -22,7 +22,7 @@ from .phantom_tank_tool import create_phantom_tank
     "astrbot_plugin_content_detection",
     "mataHape",
     "图片检测、加密和幻影坦克制作",
-    "2.0.1",
+    "2.0.2",
 )
 class MyPlugin(Star):
     # 判断配置是否完整
