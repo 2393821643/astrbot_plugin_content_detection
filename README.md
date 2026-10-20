@@ -55,7 +55,7 @@ pip install -U cos-python-sdk-v5
 
 ### 3.1:创建密钥
 
-在https://console.cloud.tencent.com/cam/capi中登录后创建密钥
+在[](https://console.cloud.tencent.com/cam/capi)中登录后创建密钥
 
 这里图省事直接使用主账号API访问密钥
 
@@ -67,7 +67,7 @@ pip install -U cos-python-sdk-v5
 
 ### 3.2:创建桶
 
-在https://console.cloud.tencent.com/cos5/bucket中创建桶，点击创建存储桶，进入创建页面
+在[](https://console.cloud.tencent.com/cos5/bucket)中创建桶，点击创建存储桶，进入创建页面
 
 ![](https://www.matahape.cn/minio/share/github/QQ20261020-012901.png)
 
@@ -97,7 +97,7 @@ pip install -U cos-python-sdk-v5
 | 重庆     | ap-chongqing |
 | 中国香港 | ap-hongkong  |
 
-其他地域ID请在https://cloud.tencent.com/document/product/213/6091中查找
+其他地域ID请在[](https://cloud.tencent.com/document/product/213/6091)中查找
 
 ## 4:配置说明
 
