@@ -1,7 +1,12 @@
 name: astrbot_plugin_content_detection
 display_name: 图片检测、加密和幻影坦克制作
 desc: 利用腾讯云CI对图片进行检测打分,以及制作幻影坦克和图片加密
+short_desc: 利用腾讯云CI对图片进行检测打分,以及制作幻影坦克和图片加密
 version: v2.0.1
 author: mataHape
 repo: https://github.com/2393821643/astrbot_plugin_content_detection
 astrbot_version: "<4.26.0"
+support_platforms:
+  - aiocqhttp
+tags:
+  - tool
