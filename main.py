@@ -139,7 +139,8 @@ class MyPlugin(Star):
 
         try:
             # 发送请求
-            response = image_detection(
+            response = await self._run_image_processing(
+                image_detection,
                 cos_client=self.cos_client,
                 bucket=self.bucket,
                 image_url=first_image_url,
