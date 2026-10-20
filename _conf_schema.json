@@ -68,8 +68,8 @@
     "default": 5
   },
   "image_size": {
-    "description": "图片文件大小,单位MB",
-    "hint": "超过图片文件大小将不被检测",
+    "description": "图片检测文件大小限制",
+    "hint": "超过图片文件大小将不被检测,单位MB",
     "type": "float",
     "default": 16,
     "slider": {
