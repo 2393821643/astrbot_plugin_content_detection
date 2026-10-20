@@ -1,6 +1,6 @@
 name: astrbot_plugin_content_detection
-display_name: 图片检测、加密和幻影坦克
-desc: 利用腾讯云CI对文本和图片进行检测打分,以及制作幻影坦克
-version: v2.0.0
+display_name: 图片检测、加密和幻影坦克制作
+desc: 利用腾讯云CI对图片进行检测打分,以及制作幻影坦克和图片加密
+version: v2.0.1
 author: mataHape
-repo: https://github.com/Soulter/helloworld # 插件的仓库地址
+repo: https://github.com/2393821643/astrbot_plugin_content_detection # 插件的仓库地址

@@ -1,4 +1,4 @@
-# 腾讯云CI内容检测和幻影坦克制作
+# 图片检测、加密和幻影坦克制作
 
 [![License](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.html)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.11%2B-blue.svg)](https://www.python.org/)
@@ -9,13 +9,19 @@
 
 本插件用于AstrBot 
 
-可将AstrBot 图片通过腾讯云COS进行图片检测；
+- 可将AstrBot 图片通过腾讯云COS进行图片检测；
 
-通过希尔伯特曲线混淆对AstrBot 图片进行加密/解密；
+- 通过希尔伯特曲线混淆对AstrBot 图片进行加密/解密；
 
-可对AstrBot 图片进行幻影坦克制作
+
+- 可对AstrBot 图片进行幻影坦克制作
+
 
 ## 2:安装说明
+
+> [!error]
+>
+> 注：由于AstrBot4.26后对底层代码进行修改，本插件无法在AstrBot4.26及其以上使用。后续插件将会适配
 
 在Astrbot运行的python环境中安装cos-python-sdk-v5
 
@@ -117,6 +123,13 @@ pip install -U cos-python-sdk-v5
 描述：对图片进行检测
 
 命令： 图片+图片检测 / 图片检测+图片 /  引用+图片检测 
+
+检测前通过 `Range: bytes=0-0` 查询文件总大小，只读取响应头后关闭连接。
+大小按 `1MB = 1024 × 1024` 字节计算；超过配置 `image_size` 时提示当前大小并停止检测，
+等于上限时仍可检测。无法获取有效大小时会提示失败并停止检测。
+
+小于 5MB 时提示“开始进行图片检测”；大于等于 5MB 时提示检测将会缓慢。
+大于等于 5MB 且小于 32MB 的图片会设置腾讯云参数 `LargeImageDetect=1`。
 
 例1：
 

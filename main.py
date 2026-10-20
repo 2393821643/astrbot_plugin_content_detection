@@ -1,4 +1,5 @@
 import asyncio
+import re
 from pathlib import Path
 from uuid import uuid4
 
@@ -17,7 +18,12 @@ from .encrypt_tool import decrypt_image, encrypt_image
 from .phantom_tank_tool import create_phantom_tank
 
 
-@register("astrbot_plugin_content_detection", "mataHape", "腾讯云CI内容检测和幻影坦克制作", "2.0.0")
+@register(
+    "astrbot_plugin_content_detection",
+    "mataHape",
+    "图片检测、加密和幻影坦克制作",
+    "2.0.1",
+)
 class MyPlugin(Star):
     # 判断配置是否完整
     def config_is_complete(self):
@@ -61,6 +67,8 @@ class MyPlugin(Star):
         self.sensitive_score = sensitive_config.get("sensitive_score", 90)
         # 噪点等级
         self.noise_level = config.get("noise_level", 5)
+        # 图片大小
+        self.image_size = config.get("image_size", 16.0)
 
     async def initialize(self):
         """可选择实现异步的插件初始化方法，当实例化该插件类之后会自动调用该方法。"""
@@ -75,6 +83,11 @@ class MyPlugin(Star):
         if not self.open_content_detection:
             yield event.plain_result("未开启图片检测")
             return
+        # 判断配置完整型
+        if not self.config_is_complete():
+            yield event.plain_result("插件配置不完全，请检查插件配置")
+            return
+
         need_check = False
         # 是否已有第一张图片
         first_image_url = None
@@ -106,13 +119,23 @@ class MyPlugin(Star):
         elif need_check and first_image_url is None:
             yield event.plain_result("未检测到图片")
             return
+        try:
+            image_size_bytes = await self._get_image_size(first_image_url)
+        except (aiohttp.ClientError, asyncio.TimeoutError, ValueError) as e:
+            logger.error(f"获取图片大小失败: {e}")
+            yield event.plain_result("无法获取图片大小，请检查图片链接或稍后重试")
+            return
+
+        megabyte = 1024 * 1024
+        if image_size_bytes > self.image_size * megabyte:
+            yield event.plain_result(
+                f"当前图片大小超过设定大小，当前图片大小{image_size_bytes / megabyte:.2f}MB"
+            )
+            return
+        if image_size_bytes >= 5 * megabyte:
+            yield event.plain_result("开始进行图片检测，图片超过5MB，检测将会缓慢")
         else:
             yield event.plain_result("开始进行图片检测")
-
-        # 判断配置完整型
-        if not self.config_is_complete():
-            yield event.plain_result("插件配置不完全，请检查插件配置")
-            return
 
         try:
             # 发送请求
@@ -120,6 +143,7 @@ class MyPlugin(Star):
                 cos_client=self.cos_client,
                 bucket=self.bucket,
                 image_url=first_image_url,
+                image_size_bytes=image_size_bytes,
             )
             logger.info(response)
             needs_protection = self.open_sensitive_protection and any(
@@ -282,6 +306,45 @@ class MyPlugin(Star):
                     image_path.unlink(missing_ok=True)
                 except OSError as e:
                     logger.warning(f"清理图片临时文件失败 {image_path.name}: {e}")
+
+    @staticmethod
+    async def _get_image_size(image_url: str) -> int:
+        """Probe total bytes with a one-byte range, without reading the body."""
+        timeout = aiohttp.ClientTimeout(total=30)
+        async with aiohttp.ClientSession(
+            timeout=timeout, auto_decompress=False
+        ) as session:
+            async with session.get(
+                image_url,
+                headers={"Range": "bytes=0-0", "Accept-Encoding": "identity"},
+                read_until_eof=False,
+            ) as response:
+                try:
+                    response.raise_for_status()
+                    if response.status == 206:
+                        content_range = response.headers.get("Content-Range", "")
+                        match = re.fullmatch(
+                            r"bytes\s+0-0/([1-9]\d*)",
+                            content_range.strip(),
+                            re.IGNORECASE,
+                        )
+                        if match:
+                            return int(match.group(1))
+                    elif response.status == 200:
+                        # Some servers ignore Range and expose the full length instead.
+                        content_type = response.headers.get("Content-Type", "").lower()
+                        content_length = response.headers.get("Content-Length", "")
+                        encoding = response.headers.get("Content-Encoding", "identity")
+                        if (
+                            not content_type.startswith(("text/", "application/json"))
+                            and encoding.lower() == "identity"
+                            and content_length.isdecimal()
+                            and int(content_length) > 0
+                        ):
+                            return int(content_length)
+                    raise ValueError("服务器未返回有效的图片总大小")
+                finally:
+                    response.close()
 
     @staticmethod
     async def _download_image(

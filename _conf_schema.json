@@ -56,15 +56,26 @@
       }
     }
   },
-  "noise_level":{
+  "noise_level": {
     "description": "噪点等级",
-        "type": "int",
-        "hint": "等级越高，噪点越多",
-        "slider": {
-          "min": 0,
-          "max": 10,
-          "step": 1
-        },
-        "default": 5
+    "type": "int",
+    "hint": "等级越高，噪点越多",
+    "slider": {
+      "min": 0,
+      "max": 10,
+      "step": 1
+    },
+    "default": 5
+  },
+  "image_size": {
+    "description": "图片文件大小,单位MB",
+    "hint": "超过图片文件大小将不被检测",
+    "type": "float",
+    "default": 16,
+    "slider": {
+      "min": 5,
+      "max": 32,
+      "step": 0.1
+    }
   }
 }
