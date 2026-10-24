@@ -77,5 +77,11 @@
       "max": 32,
       "step": 0.1
     }
+  },
+  "tool_website":{
+    "description": "图片工具链接",
+    "hint": "在此网站直接加密、解密、幻影坦克",
+    "type": "string",
+    "default": "https://www.matahape.cn/imgtool/"
   }
 }

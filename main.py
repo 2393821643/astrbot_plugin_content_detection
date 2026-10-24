@@ -69,6 +69,8 @@ class MyPlugin(Star):
         self.noise_level = config.get("noise_level", 5)
         # 图片大小
         self.image_size = config.get("image_size", 16.0)
+        # 图片大小
+        self.tool_website = config.get("tool_website", "https://www.matahape.cn/imgtool/")
 
     async def initialize(self):
         """可选择实现异步的插件初始化方法，当实例化该插件类之后会自动调用该方法。"""
@@ -294,7 +296,7 @@ class MyPlugin(Star):
                 )
                 send_path = phantom_path
 
-            result_msg_list = [Image.fromFileSystem(str(send_path))]
+            result_msg_list = [Image.fromFileSystem(str(send_path)),"请在此链接中获取原图:" + self.tool_website]
             await event.send(event.chain_result(result_msg_list))
         except Exception as e:
             logger.error(f"图片{action}失败: {e}")
