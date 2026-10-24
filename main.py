@@ -296,7 +296,10 @@ class MyPlugin(Star):
                 )
                 send_path = phantom_path
 
-            result_msg_list = [Image.fromFileSystem(str(send_path))].append("请在此链接中获取原图:" + self.tool_website)
+            result_msg_list = [
+                Image.fromFileSystem(str(send_path)),
+                Plain("请在此链接中获取原图:" + self.tool_website),
+            ]
             await event.send(event.chain_result(result_msg_list))
         except Exception as e:
             logger.error(f"图片{action}失败: {e}")
